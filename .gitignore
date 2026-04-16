@@ -1,0 +1,19 @@
+# 환경변수
+.env
+.env.local
+
+# 빌드 결과물
+football-cli
+football-cli.exe
+
+# Go 테스트 캐시
+*.test
+*.out
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
