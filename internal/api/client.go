@@ -71,13 +71,18 @@ type APIResponse struct {
 // (c *Client)는 메서드 리시버. 이 함수가 Client 구조체에 속한다는 의미.
 // c.apikey 처럼 함수내에서 사용하기 위함
 func (c *Client) Get(endpoint string, result any) error {
+	// 캐시 확인 — 유효한 캐시가 있으면 API 요청 생략
+	if cached := LoadCache(endpoint); cached != nil {
+		return json.Unmarshal(cached, result)
+	}
+
 	url := BaseURL + endpoint
 
 	// HTTP 요청 객체 생성
 	// := : 선언과 동시에 값 할당
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return fmt.Errorf("요청 생성 실패: %w", err) // %w : 에러를 래핑하는 포멧
+		return fmt.Errorf("요청 생성 실패: %w", err) // %w : 에러를 래핑하는 포맷
 	}
 
 	// API-Football 인증 헤더 설정
@@ -119,6 +124,9 @@ func (c *Client) Get(endpoint string, result any) error {
 	if apiResp.Results == 0 {
 		return fmt.Errorf("NO_DATA")
 	}
+
+	// API 응답을 캐시에 저장 — 5분 TTL
+	SaveCache(endpoint, apiResp.Response, 5*time.Minute)
 
 	// 실제 데이터를 result에 파싱
 	if err := json.Unmarshal(apiResp.Response, result); err != nil {
