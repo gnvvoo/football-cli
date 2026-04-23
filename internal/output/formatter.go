@@ -128,14 +128,31 @@ func PrintTeamInfo(name string, founded int, venue string, leagues []string) {
 	fmt.Printf("리그    : %s\n", strings.Join(leagues, ", "))
 }
 
-// PrintPlayerStats : 선수 정보 출력
-func PrintPlayerStats(name, position, dob, nationality, team string) {
-	fmt.Println()
-	fmt.Printf("이름    : %s\n", name)
-	fmt.Printf("포지션  : %s\n", position)
-	fmt.Printf("생년월일: %s\n", dob)
-	fmt.Printf("국적    : %s\n", nationality)
-	fmt.Printf("소속팀  : %s\n", team)
+// PlayerStatRow : 테이블 출력용 선수 데이터
+type PlayerStatRow struct {
+	Name        string
+	Position    string
+	DateOfBirth string
+	Age         int
+	Nationality string
+	Team        string
+}
+
+// PrintPlayerStatsTable : 선수 정보 목록을 텍스트 테이블로 출력
+func PrintPlayerStatsTable(rows []PlayerStatRow) {
+	if len(rows) == 0 {
+		fmt.Fprintln(os.Stderr, "선수 데이터가 없습니다.")
+		return
+	}
+
+	fmt.Printf("\n%-25s %-22s %-18s %-4s %-15s %-25s\n",
+		"이름", "포지션", "생년월일", "나이", "국적", "소속팀")
+	fmt.Println(strings.Repeat("-", 110))
+
+	for _, r := range rows {
+		fmt.Printf("%-25s %-22s %-18s %-4d %-15s %-25s\n",
+			r.Name, r.Position, r.DateOfBirth, r.Age, r.Nationality, r.Team)
+	}
 }
 
 // MatchRow : 테이블 출력용 경기 데이터
