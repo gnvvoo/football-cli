@@ -128,6 +128,16 @@ func PrintTeamInfo(name string, founded int, venue string, leagues []string) {
 	fmt.Printf("리그    : %s\n", strings.Join(leagues, ", "))
 }
 
+// PrintPlayerStats : 선수 정보 출력
+func PrintPlayerStats(name, position, dob, nationality, team string) {
+	fmt.Println()
+	fmt.Printf("이름    : %s\n", name)
+	fmt.Printf("포지션  : %s\n", position)
+	fmt.Printf("생년월일: %s\n", dob)
+	fmt.Printf("국적    : %s\n", nationality)
+	fmt.Printf("소속팀  : %s\n", team)
+}
+
 // MatchRow : 테이블 출력용 경기 데이터
 type MatchRow struct {
 	Date     string
