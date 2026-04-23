@@ -25,7 +25,15 @@ func FormatMatchDate(iso string) string {
 	if err != nil {
 		return iso // 파싱 실패시 원본 반환
 	}
-	return t.Format("2006-01-02 15:04")
+	
+	// 한국 시간대 로드 (UTC+9)
+	kst, err := time.LoadLocation("Asia/Seoul")
+	if err != nil {
+		// 시간대 로드 실패시 수동으로 UTC+9 적용
+		kst = time.FixedZone("KST", 9*60*60)
+	}
+
+	return t.In(kst).Format("2006-01-02 15:04 (KST)")
 }
 
 // FormatScore : 점수를 읽기 좋은 형식으로 변환
