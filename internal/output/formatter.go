@@ -155,6 +155,43 @@ func PrintPlayerStatsTable(rows []PlayerStatRow) {
 	}
 }
 
+// PrintPredict : 예측 결과 출력
+func PrintPredict(homeTeam, awayTeam, winner string, confidence float64,
+	homeScore, awayScore *int,
+	homeForm, awayForm, h2hSummary string,
+	reasoning []string,
+) {
+	winnerStr := ""
+	switch winner {
+	case "home":
+		winnerStr = homeTeam + " 승"
+	case "away":
+		winnerStr = awayTeam + " 승"
+	case "draw":
+		winnerStr = "무승부"
+	}
+
+	fmt.Println()
+	fmt.Printf("[ %s vs %s ]\n", homeTeam, awayTeam)
+	fmt.Println(strings.Repeat("-", 60))
+	fmt.Printf("예측 결과  : %s (신뢰도 %.0f%%)\n", winnerStr, confidence*100)
+	fmt.Printf("예상 스코어: %s\n", FormatScore(homeScore, awayScore))
+	fmt.Println()
+	fmt.Printf("근거\n")
+	fmt.Printf("  홈팀  : %s\n", homeForm)
+	fmt.Printf("  어웨이: %s\n", awayForm)
+	fmt.Printf("  H2H   : %s\n", h2hSummary)
+
+	if len(reasoning) > 0 {
+		fmt.Println()
+		fmt.Println("상세 분석")
+		fmt.Println(strings.Repeat("-", 60))
+		for _, r := range reasoning {
+			fmt.Printf("  - %s\n", r)
+		}
+	}
+}
+
 // MatchRow : 테이블 출력용 경기 데이터
 type MatchRow struct {
 	Date     string
