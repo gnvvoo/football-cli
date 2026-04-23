@@ -98,6 +98,27 @@ func PrintMatchesTable(matches []MatchRow) {
 	}
 }
 
+// PrintStandingsTable : 순위 목록을 텍스트 테이블로 출력
+func PrintStandingsTable(league, season string, rows []StandingRow) {
+	if len(rows) == 0 {
+		fmt.Fprintln(os.Stderr, "순위 데이터가 없습니다.")
+		return
+	}
+
+	fmt.Printf("\n%s %s 시즌 순위\n", league, season)
+	fmt.Println(strings.Repeat("-", 90))
+	fmt.Printf("%-4s %-28s %-4s %-4s %-4s %-4s %-4s %-4s %-4s %-4s %-6s\n",
+		"순위", "팀", "경기", "승", "무", "패", "득", "실", "득실", "승점", "최근폼")
+	fmt.Println(strings.Repeat("-", 90))
+
+	for _, r := range rows {
+		fmt.Printf("%-4d %-28s %-4d %-4d %-4d %-4d %-4d %-4d %-4d %-4d %-6s\n",
+			r.Rank, r.Team, r.Played, r.Won, r.Drawn, r.Lost,
+			r.GF, r.GA, r.GD, r.Points, r.Form,
+		)
+	}
+}
+
 // MatchRow : 테이블 출력용 경기 데이터
 type MatchRow struct {
 	Date     string
@@ -105,4 +126,19 @@ type MatchRow struct {
 	AwayTeam string
 	Status   string
 	Score    string
+}
+
+// StandingRow : 테이블 출력용 순위 데이터
+type StandingRow struct {
+	Rank   int
+	Team   string
+	Played int
+	Won    int
+	Drawn  int
+	Lost   int
+	GF     int
+	GA     int
+	GD     int
+	Points int
+	Form   string
 }
