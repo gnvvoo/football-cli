@@ -123,3 +123,22 @@ func formatForm(form string) string {
 	}
 	return result
 }
+
+// getRawStandings : predict에서 사용하는 원본 TeamStanding 데이터 반환
+// GetStandings는 출력용으로 변환하기 때문에 predict에서 직접 계산하려면 원본이 필요
+func (c *Client) getRawStandings(leagueID int) ([]TeamStanding, error) {
+	endpoint := fmt.Sprintf("/competitions/%d/standings", leagueID)
+
+	var apiResp StandingsAPIResponse
+	if err := c.Get(endpoint, &apiResp); err != nil {
+		return nil, err
+	}
+
+	for _, s := range apiResp.Standings {
+		if s.Type == "TOTAL" {
+			return s.Table, nil
+		}
+	}
+
+	return nil, fmt.Errorf("NO_DATA")
+}
