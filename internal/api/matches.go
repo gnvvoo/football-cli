@@ -16,15 +16,15 @@ type Match struct {
 	ID          int        `json:"id"`
 	UtcDate     string     `json:"utcDate"`   // ISO8601 형식
 	Status      string     `json:"status"`    // "SCHEDULED", "IN_PLAY", "FINISHED" 등
-	HomeTeam    MatchTeam  `json:"homeTeam"`
-	AwayTeam    MatchTeam  `json:"awayTeam"`
+	HomeTeam    Team  `json:"homeTeam"`
+	AwayTeam    Team  `json:"awayTeam"`
 	Score       MatchScore `json:"score"`
 	Competition Competition `json:"competition"`
 	Venue       string     `json:"venue"`
 }
 
 // 팀 기본 정보
-type MatchTeam struct {
+type Team struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
