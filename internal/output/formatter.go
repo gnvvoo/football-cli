@@ -119,6 +119,15 @@ func PrintStandingsTable(league, season string, rows []StandingRow) {
 	}
 }
 
+// PrintTeamInfo : 팀 정보 출력
+func PrintTeamInfo(name string, founded int, venue string, leagues []string) {
+	fmt.Println()
+	fmt.Printf("팀명    : %s\n", name)
+	fmt.Printf("창단    : %d년\n", founded)
+	fmt.Printf("경기장  : %s\n", venue)
+	fmt.Printf("리그    : %s\n", strings.Join(leagues, ", "))
+}
+
 // MatchRow : 테이블 출력용 경기 데이터
 type MatchRow struct {
 	Date     string
