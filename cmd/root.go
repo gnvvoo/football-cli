@@ -3,6 +3,8 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"football-cli/internal/output"
+	"football-cli/internal/schema"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -12,10 +14,11 @@ import (
 // var 블록으로 여러 전역 변수를 한 번에 선언하는 문법
 // -> cmd 패키지 전체에서 접근 가능하다.
 var (
-	JSONOutput bool
-	NoColor    bool
-	Quiet      bool
-	Timeout    int
+	JSONOutput   bool
+	NoColor      bool
+	Quiet        bool
+	Timeout      int
+	manifestFlag bool
 )
 
 // exit code 상수
@@ -36,6 +39,9 @@ var rootCmd = &cobra.Command{
 	Short: "AI-agent-friendly football data CLI",                                                         // --help에서 한 줄 설명
 	Long:  "Fetch match schedules, standings, player stats, and predictions for top 5 European leagues.", // 상세 설명
 	RunE: func(cmd *cobra.Command, args []string) error {
+		if manifestFlag {
+			return output.PrintJSON(schema.GetManifest())
+		}
 		return cmd.Help()
 	},
 }
@@ -57,6 +63,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&NoColor, "no-color", false, "Disable ANSI color codes")
 	rootCmd.PersistentFlags().BoolVar(&Quiet, "quiet", false, "Suppress stderr logs")
 	rootCmd.PersistentFlags().IntVar(&Timeout, "timeout", 5000, "Request timeout in milliseconds")
+	rootCmd.Flags().BoolVar(&manifestFlag, "manifest", false, "Print CLI manifest (AI agent entry point)")
 }
 
 // 에러 출력 헬퍼 — 항상 stderr로 출력
