@@ -19,6 +19,7 @@ var (
 	Quiet        bool
 	Timeout      int
 	manifestFlag bool
+	SchemaFlag   bool // 추가
 )
 
 // exit code 상수
@@ -64,6 +65,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&Quiet, "quiet", false, "Suppress stderr logs")
 	rootCmd.PersistentFlags().IntVar(&Timeout, "timeout", 5000, "Request timeout in milliseconds")
 	rootCmd.Flags().BoolVar(&manifestFlag, "manifest", false, "Print CLI manifest (AI agent entry point)")
+	rootCmd.PersistentFlags().BoolVar(&SchemaFlag, "schema", false, "Print input/output schema for this command")
 }
 
 // 에러 출력 헬퍼 — 항상 stderr로 출력

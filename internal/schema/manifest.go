@@ -211,3 +211,10 @@ func GetManifest() Manifest {
 		},
 	}
 }
+
+// GetCommandSchema : 특정 커맨드의 스키마만 반환
+func GetCommandSchema(commandName string) (Command, bool) {
+	manifest := GetManifest()
+	cmd, ok := manifest.Commands[commandName]
+	return cmd, ok
+}

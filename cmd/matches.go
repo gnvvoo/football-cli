@@ -3,6 +3,7 @@
 import (
 	"football-cli/internal/api"
 	"football-cli/internal/output"
+	"football-cli/internal/schema"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -42,6 +43,12 @@ func init() {
 }
 
 func runMatches(cmd *cobra.Command, args []string) error {
+	// --schema 플래그 시 스키마 출력 후 종료
+	if SchemaFlag {
+		s, _ := schema.GetCommandSchema("matches")
+		return output.PrintJSON(s)
+	}
+
 	// 리그 약어 → API ID 변환
 	leagueID, ok := api.LeagueIDs[matchesLeague]
 	if !ok {

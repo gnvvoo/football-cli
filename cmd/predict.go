@@ -3,6 +3,7 @@
 import (
 	"football-cli/internal/api"
 	"football-cli/internal/output"
+	"football-cli/internal/schema"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -34,6 +35,12 @@ func init() {
 }
 
 func runPredict(cmd *cobra.Command, args []string) error {
+	// --schema 플래그 시 스키마 출력 후 종료
+	if SchemaFlag {
+		s, _ := schema.GetCommandSchema("predict")
+		return output.PrintJSON(s)
+	}
+
 	client, err := api.NewClient(Timeout)
 	if err != nil {
 		PrintError("AUTH_FAILURE", err.Error(), nil)
