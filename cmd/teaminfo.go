@@ -23,7 +23,7 @@ func init() {
 	rootCmd.AddCommand(teamInfoCmd)
 
 	teamInfoCmd.Flags().StringVar(&teamInfoTeam, "team", "", "팀 이름 (부분 검색 가능) [필수]")
-	teamInfoCmd.MarkFlagRequired("team")
+	// teamInfoCmd.MarkFlagRequired("team")
 }
 
 func runTeamInfo(cmd *cobra.Command, args []string) error {
@@ -31,6 +31,11 @@ func runTeamInfo(cmd *cobra.Command, args []string) error {
 	if SchemaFlag {
 		s, _ := schema.GetCommandSchema("team-info")
 		return output.PrintJSON(s)
+	}
+	// --schema 없을 때만 필수 플래그 검증
+	if teamInfoTeam == "" {
+		PrintError("INVALID_ARGS", "--team 플래그가 필요합니다.", nil)
+		os.Exit(ExitInvalidArgs)
 	}
 
 	client, err := api.NewClient(Timeout)

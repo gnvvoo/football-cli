@@ -38,8 +38,6 @@ func init() {
 	matchesCmd.Flags().StringVar(&matchesTeam, "team", "", "팀 이름 (부분 검색 가능)")
 	matchesCmd.Flags().StringVar(&matchesStatus, "status", "", "경기 상태 (live|upcoming|finished)")
 
-	// --league 필수 flag로 지정
-	matchesCmd.MarkFlagRequired("league")
 }
 
 func runMatches(cmd *cobra.Command, args []string) error {
@@ -47,6 +45,12 @@ func runMatches(cmd *cobra.Command, args []string) error {
 	if SchemaFlag {
 		s, _ := schema.GetCommandSchema("matches")
 		return output.PrintJSON(s)
+	}
+
+	// --schema 없을 때만 필수 플래그 검증
+	if matchesLeague == "" {
+		PrintError("INVALID_ARGS", "--league 플래그가 필요합니다.", []string{"EPL", "LaLiga", "Bundesliga", "SerieA", "Ligue1"})
+		os.Exit(ExitInvalidArgs)
 	}
 
 	// 리그 약어 → API ID 변환

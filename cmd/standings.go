@@ -31,7 +31,7 @@ func init() {
 	standingsCmd.Flags().IntVar(&standingsSeason, "season", 0, "시즌 연도 (예: 2024, 기본값: 현재 시즌)")
 
 	// --league 필수 flag로 지정
-	standingsCmd.MarkFlagRequired("league")
+	// standingsCmd.MarkFlagRequired("league")
 }
 
 func runStandings(cmd *cobra.Command, args []string) error {
@@ -39,6 +39,12 @@ func runStandings(cmd *cobra.Command, args []string) error {
 	if SchemaFlag {
 		s, _ := schema.GetCommandSchema("standings")
 		return output.PrintJSON(s)
+	}
+
+	// --schema 없을 때만 필수 플래그 검증
+	if standingsLeague == "" {
+		PrintError("INVALID_ARGS", "--league 플래그가 필요합니다.", nil)
+		os.Exit(ExitInvalidArgs)
 	}
 
 	// 리그 약어 → API ID 변환

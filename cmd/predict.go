@@ -30,8 +30,8 @@ func init() {
 	predictCmd.Flags().StringVar(&predictAway, "away", "", "어웨이팀 이름 (부분 검색 가능) [필수]")
 	predictCmd.Flags().BoolVar(&predictExplain, "explain", false, "예측 근거 출력")
 
-	predictCmd.MarkFlagRequired("home")
-	predictCmd.MarkFlagRequired("away")
+	// predictCmd.MarkFlagRequired("home")
+	// predictCmd.MarkFlagRequired("away")
 }
 
 func runPredict(cmd *cobra.Command, args []string) error {
@@ -39,6 +39,12 @@ func runPredict(cmd *cobra.Command, args []string) error {
 	if SchemaFlag {
 		s, _ := schema.GetCommandSchema("predict")
 		return output.PrintJSON(s)
+	}
+
+	// --schema 없을 때만 필수 플래그 검증
+	if predictHome == "" || predictAway == "" {
+		PrintError("INVALID_ARGS", "--home, --away 플래그가 필요합니다.", nil)
+		os.Exit(ExitInvalidArgs)
 	}
 
 	client, err := api.NewClient(Timeout)

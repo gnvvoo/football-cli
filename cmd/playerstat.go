@@ -27,7 +27,8 @@ func init() {
 
 	playerStatsCmd.Flags().StringVar(&playerStatsPlayer, "player", "", "선수 이름 (부분 검색 가능) [필수]")
 	playerStatsCmd.Flags().StringVar(&playerStatsLeague, "league", "", "리그 (EPL|LaLiga|Bundesliga|SerieA|Ligue1) [선택]")
-	playerStatsCmd.MarkFlagRequired("player")
+
+	// playerStatsCmd.MarkFlagRequired("player")
 }
 
 func runPlayerStats(cmd *cobra.Command, args []string) error {
@@ -35,6 +36,12 @@ func runPlayerStats(cmd *cobra.Command, args []string) error {
 	if SchemaFlag {
 		s, _ := schema.GetCommandSchema("player-stats")
 		return output.PrintJSON(s)
+	}
+
+	// --schema 없을 때만 필수 플래그 검증
+	if playerStatsPlayer == "" {
+		PrintError("INVALID_ARGS", "--player 플래그가 필요합니다.", nil)
+		os.Exit(ExitInvalidArgs)
 	}
 
 	client, err := api.NewClient(Timeout)
