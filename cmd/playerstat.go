@@ -52,21 +52,12 @@ func runPlayerStats(cmd *cobra.Command, args []string) error {
 
 	resp, err := client.GetPlayerStats(playerStatsPlayer, playerStatsLeague)
 	if err != nil {
-		switch err.Error() {
-		case "NO_DATA":
-			PrintError("NO_DATA", "선수를 찾을 수 없습니다: "+playerStatsPlayer, nil)
-			os.Exit(ExitNoData)
-		case "INVALID_LEAGUE":
+		if err.Error() == "INVALID_LEAGUE" {
 			PrintError("INVALID_LEAGUE", "유효하지 않은 리그입니다: "+playerStatsLeague,
 				[]string{"EPL", "LaLiga", "Bundesliga", "SerieA", "Ligue1"})
 			os.Exit(ExitInvalidArgs)
-		case "AUTH_FAILURE":
-			PrintError("AUTH_FAILURE", "API 인증에 실패했습니다. API 키를 확인해주세요.", nil)
-			os.Exit(ExitAuthFailure)
-		default:
-			PrintError("API_FAILURE", err.Error(), nil)
-			os.Exit(ExitAPIFailure)
 		}
+		handleAPIError(err, "선수를 찾을 수 없습니다: "+playerStatsPlayer)
 	}
 
 	if JSONOutput {

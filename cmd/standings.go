@@ -68,17 +68,7 @@ func runStandings(cmd *cobra.Command, args []string) error {
 	// 순위 데이터 조회
 	resp, err := client.GetStandings(leagueID)
 	if err != nil {
-		switch err.Error() {
-		case "NO_DATA":
-			PrintError("NO_DATA", "순위 데이터가 없습니다.", nil)
-			os.Exit(ExitNoData)
-		case "AUTH_FAILURE":
-			PrintError("AUTH_FAILURE", "API 인증에 실패했습니다. API 키를 확인해주세요.", nil)
-			os.Exit(ExitAuthFailure)
-		default:
-			PrintError("API_FAILURE", err.Error(), nil)
-			os.Exit(ExitAPIFailure)
-		}
+		handleAPIError(err, "순위 데이터가 없습니다.")
 	}
 
 	// --json 플래그 시 JSON 출력
