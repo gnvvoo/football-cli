@@ -68,6 +68,21 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&SchemaFlag, "schema", false, "Print input/output schema for this command")
 }
 
+// handleAPIError : API 호출 에러를 공통 처리하고 적절한 exit code로 종료
+func handleAPIError(err error, noDataMsg string) {
+	switch err.Error() {
+	case "NO_DATA":
+		PrintError("NO_DATA", noDataMsg, nil)
+		os.Exit(ExitNoData)
+	case "AUTH_FAILURE":
+		PrintError("AUTH_FAILURE", "API 인증에 실패했습니다. API 키를 확인해주세요.", nil)
+		os.Exit(ExitAuthFailure)
+	default:
+		PrintError("API_FAILURE", err.Error(), nil)
+		os.Exit(ExitAPIFailure)
+	}
+}
+
 // 에러 출력 헬퍼 — 항상 stderr로 출력
 func PrintError(code string, message string, suggestions []string) {
 	type ErrorBody struct {

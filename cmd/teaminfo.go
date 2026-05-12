@@ -46,17 +46,7 @@ func runTeamInfo(cmd *cobra.Command, args []string) error {
 
 	resp, err := client.GetTeamInfo(teamInfoTeam)
 	if err != nil {
-		switch err.Error() {
-		case "NO_DATA":
-			PrintError("NO_DATA", "팀을 찾을 수 없습니다: "+teamInfoTeam, nil)
-			os.Exit(ExitNoData)
-		case "AUTH_FAILURE":
-			PrintError("AUTH_FAILURE", "API 인증에 실패했습니다. API 키를 확인해주세요.", nil)
-			os.Exit(ExitAuthFailure)
-		default:
-			PrintError("API_FAILURE", err.Error(), nil)
-			os.Exit(ExitAPIFailure)
-		}
+		handleAPIError(err, "팀을 찾을 수 없습니다: "+teamInfoTeam)
 	}
 
 	if JSONOutput {
