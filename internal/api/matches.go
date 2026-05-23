@@ -79,18 +79,30 @@ type ScoreOutput struct {
 // date: "2026-04-13" 형식, 빈 문자열이면 오늘 날짜 사용
 // team: 팀 이름 필터 (빈 문자열이면 전체)
 // status: "live", "upcoming", "finished" (빈 문자열이면 전체)
-func (c *Client) GetMatches(leagueID int, date, team, status string) (*MatchesResponse, error) {
-	// 날짜가 없으면 오늘 날짜 사용
-	if date == "" {
-		// Go의 날짜 포맷은 2006-01-02 기준
-		date = time.Now().Format("2006-01-02")
+func (c *Client) GetMatches(leagueID int, date, from, to, team, status string) (*MatchesResponse, error) {
+	today := time.Now().Format("2006-01-02")
+
+	dateFrom := date
+	dateTo := date
+
+	if from != "" {
+		dateFrom = from
+	}
+	if to != "" {
+		dateTo = to
+	}
+	if dateFrom == "" {
+		dateFrom = today
+	}
+	if dateTo == "" {
+		dateTo = dateFrom
 	}
 
 	// 엔드포인트 조합
 	endpoint := fmt.Sprintf("/competitions/%d/matches?dateFrom=%s&dateTo=%s",
 		leagueID,
-		date,
-		date,
+		dateFrom,
+		dateTo,
 	)
 
 	// API 호출

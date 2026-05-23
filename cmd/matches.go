@@ -72,7 +72,7 @@ func runMatches(cmd *cobra.Command, args []string) error {
 	}
 
 	// 경기 데이터 조회
-	resp, err := client.GetMatches(leagueID, matchesDate, matchesTeam, matchesStatus)
+	resp, err := client.GetMatches(leagueID, matchesDate, matchesFrom, matchesTo, matchesTeam, matchesStatus)
 	if err != nil {
 		handleAPIError(err, "조회된 경기가 없습니다.")
 	}
