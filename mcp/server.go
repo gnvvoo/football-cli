@@ -62,6 +62,18 @@ func main() {
 		handleGetMatches(client),
 	)
 
+	// standings 툴 등록
+	s.AddTool(
+    	mcp.NewTool("get_standings",
+        	mcp.WithDescription("리그 순위 조회"),
+        	mcp.WithString("league",
+            	mcp.Required(),
+            	mcp.Description("리그 약어: EPL, LaLiga, Bundesliga, SerieA, Ligue1"),
+        	),
+    	),
+    	handleGetStandings(client),
+	)
+
 	// stdio 모드로 실행
 	if err := server.ServeStdio(s); err != nil {
 		fmt.Fprintf(os.Stderr, "서버 오류: %v\n", err)
@@ -117,4 +129,33 @@ func handleGetMatches(client *api.Client) server.ToolHandlerFunc {
 
 		return mcp.NewToolResultText(string(b)), nil
 	}
+}
+// standings 툴 핸들러
+func handleGetStandings(client *api.Client) server.ToolHandlerFunc {
+    return func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+        args, _ := req.Params.Arguments.(map[string]any)
+        league := stringArg(args, "league")
+
+        leagueID, ok := api.LeagueIDs[league]
+        if !ok {
+            return mcp.NewToolResultError(
+                fmt.Sprintf("지원하지 않는 리그입니다: %s", league),
+            ), nil
+        }
+
+        result, err := client.GetStandings(leagueID)
+        if err != nil {
+            if err.Error() == "NO_DATA" {
+                return mcp.NewToolResultError("순위 데이터가 없습니다"), nil
+            }
+            return mcp.NewToolResultError(fmt.Sprintf("API 오류: %v", err)), nil
+        }
+
+        b, err := json.Marshal(result)
+        if err != nil {
+            return mcp.NewToolResultError("응답 직렬화 실패"), nil
+        }
+
+        return mcp.NewToolResultText(string(b)), nil
+    }
 }
