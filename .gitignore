@@ -17,3 +17,6 @@ football-cli.exe
 # OS
 .DS_Store
 Thumbs.db
+
+# MCP
+mcp.exe
