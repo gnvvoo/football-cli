@@ -2,7 +2,6 @@ package api
 
 import (
 	"fmt"
-	"strings"
 	"time"
 )
 
@@ -166,7 +165,5 @@ func matchStatus(apiStatus, filter string) bool {
 // 홈 또는 어웨이 팀 이름에 검색어가 포함되는지 확인
 // 대소문자 구분 없이 부분 매칭
 func containsTeam(home, away, query string) bool {
-	q := strings.ToLower(query)
-	return strings.Contains(strings.ToLower(home), q) ||
-		strings.Contains(strings.ToLower(away), q)
+	return containsNormalized(home, query) || containsNormalized(away, query)
 }

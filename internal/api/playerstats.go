@@ -2,7 +2,6 @@ package api
 
 import (
 	"fmt"
-	"strings"
 	"time"
 )
 
@@ -95,7 +94,7 @@ func (c *Client) GetPlayerStats(playerName, league string) (*PlayerStatsResponse
 			}
 
 			for _, p := range squadResp.Squad {
-				if strings.Contains(strings.ToLower(p.Name), strings.ToLower(playerName)) {
+				if containsNormalized(p.Name, playerName) {
 					found = append(found, PlayerOutput{
 						ID:          p.ID,
 						Name:        p.Name,
