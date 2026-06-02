@@ -74,6 +74,18 @@ func main() {
     	handleGetStandings(client),
 	)
 
+	// team-info 툴 등록
+	s.AddTool(
+		mcp.NewTool("get_team_info",
+			mcp.WithDescription("팀 정보 조회. 창단연도, 경기장, 소속 리그 포함"),
+			mcp.WithString("team",
+				mcp.Required(),
+				mcp.Description("팀 이름 (부분 검색 가능, 예: Arsenal)"),
+			),
+		),
+		handleGetTeamInfo(client),
+	)
+
 	// stdio 모드로 실행
 	if err := server.ServeStdio(s); err != nil {
 		fmt.Fprintf(os.Stderr, "서버 오류: %v\n", err)
@@ -130,6 +142,7 @@ func handleGetMatches(client *api.Client) server.ToolHandlerFunc {
 		return mcp.NewToolResultText(string(b)), nil
 	}
 }
+
 // standings 툴 핸들러
 func handleGetStandings(client *api.Client) server.ToolHandlerFunc {
     return func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -147,6 +160,29 @@ func handleGetStandings(client *api.Client) server.ToolHandlerFunc {
         if err != nil {
             if err.Error() == "NO_DATA" {
                 return mcp.NewToolResultError("순위 데이터가 없습니다"), nil
+            }
+            return mcp.NewToolResultError(fmt.Sprintf("API 오류: %v", err)), nil
+        }
+
+        b, err := json.Marshal(result)
+        if err != nil {
+            return mcp.NewToolResultError("응답 직렬화 실패"), nil
+        }
+
+        return mcp.NewToolResultText(string(b)), nil
+    }
+}
+
+// team-info 툴 핸들러
+func handleGetTeamInfo(client *api.Client) server.ToolHandlerFunc {
+    return func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+        args, _ := req.Params.Arguments.(map[string]any)
+        team := stringArg(args, "team")
+
+        result, err := client.GetTeamInfo(team)
+        if err != nil {
+            if err.Error() == "NO_DATA" {
+                return mcp.NewToolResultError(fmt.Sprintf("팀을 찾을 수 없습니다: %s", team)), nil
             }
             return mcp.NewToolResultError(fmt.Sprintf("API 오류: %v", err)), nil
         }
