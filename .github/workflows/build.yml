@@ -5,33 +5,56 @@ name: Build and Release
 on:
   push:
     tags:
-      - 'v*' # v1.0.0, v1.2.3 같은 태그 push 시 실행
+      - 'v*'
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        include:
+          - goos: linux
+            goarch: amd64
+            suffix: linux-amd64
+          - goos: darwin
+            goarch: amd64
+            suffix: darwin-amd64
+          - goos: darwin
+            goarch: arm64
+            suffix: darwin-arm64
+          - goos: windows
+            goarch: amd64
+            suffix: windows-amd64
+            ext: .exe
+
     steps:
-      # 1. 코드 가져오기
       - name: 코드 체크아웃
         uses: actions/checkout@v4
 
-      # 2. Go 설치
       - name: Go 설치
         uses: actions/setup-go@v5
         with:
           go-version: '1.22'
 
-      # 3. 의존성 설치
       - name: 의존성 설치
         run: go mod tidy
 
-      # 4. Linux 바이너리 빌드
-      - name: Linux 바이너리 빌드
-        run: go build -o football-cli .
+      - name: CLI 바이너리 빌드
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+        run: go build -o football-cli-${{ matrix.suffix }}${{ matrix.ext }} .
 
-      # 5. GitHub Releases에 바이너리 업로드
+      - name: MCP 바이너리 빌드
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+        run: go build -o football-mcp-${{ matrix.suffix }}${{ matrix.ext }} ./mcp/
+
       - name: GitHub Releases 업로드
         uses: softprops/action-gh-release@v2
         with:
-          files: football-cli
+          files: |
+            football-cli-${{ matrix.suffix }}${{ matrix.ext }}
+            football-mcp-${{ matrix.suffix }}${{ matrix.ext }}
