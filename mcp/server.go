@@ -101,6 +101,25 @@ func main() {
 		handleGetPlayerStats(client),
 	)
 
+	// predict 툴 등록
+	s.AddTool(
+		mcp.NewTool("predict_match",
+			mcp.WithDescription("두 팀의 경기 결과 예측. 순위·맞대결·홈 어드밴티지 기반"),
+			mcp.WithString("home",
+				mcp.Required(),
+				mcp.Description("홈팀 이름 (부분 검색 가능, 예: Arsenal)"),
+			),
+			mcp.WithString("away",
+				mcp.Required(),
+				mcp.Description("어웨이팀 이름 (부분 검색 가능, 예: Chelsea)"),
+			),
+			mcp.WithBoolean("explain",
+				mcp.Description("예측 근거 상세 출력 여부"),
+			),
+		),
+		handlePredictMatch(client),
+	)
+
 	// stdio 모드로 실행
 	if err := server.ServeStdio(s); err != nil {
 		fmt.Fprintf(os.Stderr, "서버 오류: %v\n", err)
@@ -222,6 +241,38 @@ func handleGetPlayerStats(client *api.Client) server.ToolHandlerFunc {
         if err != nil {
             if err.Error() == "NO_DATA" {
                 return mcp.NewToolResultError(fmt.Sprintf("선수를 찾을 수 없습니다: %s", player)), nil
+            }
+            return mcp.NewToolResultError(fmt.Sprintf("API 오류: %v", err)), nil
+        }
+
+        b, err := json.Marshal(result)
+        if err != nil {
+            return mcp.NewToolResultError("응답 직렬화 실패"), nil
+        }
+
+        return mcp.NewToolResultText(string(b)), nil
+    }
+}
+
+// predict 툴 핸들러
+func handlePredictMatch(client *api.Client) server.ToolHandlerFunc {
+    return func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+        args, _ := req.Params.Arguments.(map[string]any)
+        home := stringArg(args, "home")
+        away := stringArg(args, "away")
+
+        // explain은 bool 타입이라 별도 추출
+        explain := false
+        if v, ok := args["explain"]; ok {
+            explain, _ = v.(bool)
+        }
+
+        result, err := client.Predict(home, away, explain)
+        if err != nil {
+            if err.Error() == "NO_DATA" {
+                return mcp.NewToolResultError(
+                    fmt.Sprintf("팀을 찾을 수 없습니다: %s 또는 %s", home, away),
+                ), nil
             }
             return mcp.NewToolResultError(fmt.Sprintf("API 오류: %v", err)), nil
         }
